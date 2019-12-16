@@ -1,5 +1,6 @@
 from flask import Flask, request,jsonify
 from  flask_mysqldb import MySQL
+from werkzeug.security import generate_password_hash ,check_password_hash
 import yaml
 
 #init app
@@ -27,12 +28,14 @@ def register():
     _name=_json['name']
     _email=_json['email']
     _password=_json['password']
-    
     print(request.json)
     
     if _name and _email and _password and request.method=='POST':
+        #generate the hash of password
+        _password_hash=generate_password_hash(_password)
+
         cursor=mysql.connection.cursor()
-        cursor.execute('insert into users(name,email,password) values(%s,%s,%s)',(_name,_email,_password))
+        cursor.execute('insert into users(name,email,password) values(%s,%s,%s)',(_name,_email,_password_hash))
         mysql.connection.commit()
 
         cursor.close()
@@ -56,7 +59,7 @@ def login():
             userDetails=cursor.fetchall()
             for user in userDetails:
                 print(user)
-                if _email==user[2] and _password==user[3]:
+                if _email==user[2] and check_password_hash(user[3],_password):
                     return 'login successfull'
     return 'login failed'   
 
