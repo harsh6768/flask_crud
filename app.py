@@ -55,10 +55,11 @@ def login():
             #to fetch all the values
             userDetails=cursor.fetchall()
             for user in userDetails:
+                print(user)
                 if _email==user[2] and _password==user[3]:
                     return 'login successfull'
     return 'login failed'   
-    
+
 @app.route('/getUsers',methods=['GET'])
 def get_users():
     print('users detail')
